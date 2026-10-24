@@ -67,15 +67,15 @@ background:linear-gradient(90deg,rgba(10,22,14,.82) 0%,rgba(10,22,14,.6) 38%,rgb
 .card:nth-child(2) .more{color:var(--brown)}
 
 /* network */
-.net{display:grid;grid-template-columns:1fr 1fr 1fr;min-height:420px;background:var(--green)}
-.net .ph2{overflow:hidden;min-height:300px}
+.net{display:grid;grid-template-columns:1fr 1fr;background:var(--green)}
+.net .nc{grid-column:1/-1}
+.net .ph2{overflow:hidden;aspect-ratio:764/361}
 .net .ph2 img{width:100%;height:100%;object-fit:cover}
-.net .ph2:first-child img{object-position:22% center}.net .ph2:last-child img{object-position:74% center}
 .nc{color:#f6efe0;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:34px clamp(20px,2.6vw,44px)}
 .eyebrow{letter-spacing:.2em;font-size:.82rem;text-transform:uppercase;color:#efe4cb}
 .nc .rule{width:110px;height:2px;margin:12px auto 18px}
 .nc h2{font-size:clamp(1.9rem,3vw,2.8rem);margin-bottom:18px}
-.nc p{font-size:1.06rem;max-width:400px;margin:0 0 24px;color:#e9e2d2}
+.nc p{font-size:1.06rem;max-width:640px;margin:0 0 24px;color:#e9e2d2}
 .nc .btn{font-size:.98rem}
 
 /* footer */
@@ -96,7 +96,6 @@ footer{background:var(--foot);color:#efe5d3}
 @media(max-width:980px){
  .strip .wrap{grid-template-columns:1fr 1fr;row-gap:18px}.feat:nth-child(2){border:0}
  #servicios{grid-template-columns:1fr 1fr}.card:nth-child(2){border-right:0}
- .net{grid-template-columns:1fr 1fr}.nc{grid-column:1/-1;grid-row:1}
  .fg{grid-template-columns:1fr 1fr;row-gap:22px}.fg>div{border:0;padding-inline:0}
 }
 @media(max-width:700px){
@@ -107,7 +106,7 @@ footer{background:var(--foot);color:#efe5d3}
  .hero{background:linear-gradient(180deg,rgba(10,22,14,.55),rgba(10,22,14,.85)),url('img/hero-canal.jpg') 86% center/cover no-repeat}
  .feat{justify-content:flex-start;font-size:.9rem;border:0}.feat svg{width:32px;height:32px}
  #servicios{grid-template-columns:1fr}.card{border-right:0;border-bottom:1px solid var(--line)}
- .net{display:flex;flex-direction:column}.net .ph2{height:260px}
+ .net{grid-template-columns:1fr}
  .fg{grid-template-columns:1fr}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
@@ -167,8 +166,8 @@ footer{background:var(--foot);color:#efe5d3}
 </section>
 
 <section class="net" id="red" aria-labelledby="rt">
- <div class="ph2"><img src="img/red-productores.jpg" alt="Productores sonrientes cosechando café robusta" loading="lazy"></div>
  <div class="nc"><div class="eyebrow">Nuestra red de afiliados</div><div class="rule"></div><h2 id="rt">Una red que multiplica oportunidades.</h2><p>Conectamos productores, aliados y distribuidores para crear oportunidades reales a través del café robusta, generando valor para las comunidades rurales de Panamá.</p><a class="btn" href="#contacto"><svg aria-hidden="true"><use href="#group"/></svg>Conoce nuestra red de afiliados<svg aria-hidden="true"><use href="#arrow"/></svg></a></div>
+ <div class="ph2"><img src="img/red-productores.jpg" alt="Productores sonrientes cosechando café robusta" loading="lazy"></div>
  <div class="ph2"><img src="img/red-distribuidores.jpg" alt="Distribuidores de la red: taxista, joven en silla de ruedas con una caja de Café del Canal y señor con bastón" loading="lazy"></div>
 </section>
 </main>
