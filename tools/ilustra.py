@@ -1,7 +1,10 @@
-# Flat infographic-style illustrations for the site (no outlines, pastel palette,
-# geometric people). Writes SVG files to img/ilustra/.
-#   python3 tools/ilustra.py
-import math, os
+# Illustrations for the site, from the same scenes in two looks:
+#   flat    - infographic style: no outlines, pastel palette, geometric people (img/ilustra/)
+#   britto  - pop-art in the manner of Romero Britto: saturated colors, heavy black outlines,
+#             shapes filled with stripes/dots/checks, backgrounds cut into colored blocks (img/britto/)
+#   python3 tools/ilustra.py [flat|britto]
+import sys
+import math, os, random
 
 C = dict(
     sky='#a9d6de', sky2='#8fc9d9', teal='#5ba3a6', teal2='#3e7c82', teal3='#2f5f66', navy='#2f4858',
@@ -12,20 +15,73 @@ C = dict(
     skin1='#e9b48f', skin2='#c98b62', skin3='#a86b48', hair='#2b211c',
 )
 
+THEME = 'flat'
+VIVID = dict(sky='#29b6f6', sky2='#00c2ff', teal='#00a99d', teal2='#1a237e', teal3='#00695c', navy='#1a1a2e',
+    mint='#7ed957', green='#3cb043', green2='#0b8a3b', grass='#a4d930', leaf='#1e9e4a', leaf2='#0b6b34',
+    mustard='#ffd500', yellow='#ffe600', salmon='#ff6fae', pink='#ff9ecb', red='#ff1f3d', cherry='#e00034',
+    orange='#ff7a00', brown='#b5562b', brown2='#7a3a1d', dbrown='#3b1f12', cream='#fff6d6', kraft='#f2b766',
+    kraft2='#e0973a', lav='#9b5de5', gray='#b0bec5', gray2='#607d8b', steel='#e0e6ea', white='#ffffff')
+# big areas get a pattern, the rest a solid vivid color
+PATTERNED = dict(sky='dots', sky2='waves', teal='stripes', mint='dots', mustard='stripes', salmon='dots',
+    lav='checks', grass='stripes', pink='checks', kraft='dots', white='stripesR', cream='dots')
+PAT2 = dict(sky='#ffffff', sky2='#ffffff', teal='#ffd500', mint='#ffffff', mustard='#ff7a00', salmon='#ffffff',
+    lav='#c77dff', grass='#3cb043', pink='#ffffff', kraft='#ffffff', white='#ff1f3d', cream='#ff6fae')
+REV = {v: k for k, v in C.items()}
+SW = 3
+
+def F(f):
+    if THEME != 'britto' or f == 'none': return f
+    name = REV.get(f)
+    if name is None: return f
+    return f'url(#p-{name})' if name in PATTERNED else VIVID.get(name, f)
+
+def patterns():
+    out = []
+    for name, kind in PATTERNED.items():
+        b, c = VIVID[name], PAT2[name]
+        if kind == 'dots': body, sz = f'<rect width="18" height="18" fill="{b}"/><circle cx="5" cy="5" r="3" fill="{c}"/><circle cx="14" cy="14" r="3" fill="{c}"/>', 18
+        elif kind in ('stripes', 'stripesR'): body, sz = f'<rect width="16" height="16" fill="{b}"/><rect width="16" height="6" fill="{c}"/>', 16
+        elif kind == 'checks': body, sz = f'<rect width="20" height="20" fill="{b}"/><rect width="10" height="10" fill="{c}"/><rect x="10" y="10" width="10" height="10" fill="{c}"/>', 20
+        else: body, sz = f'<rect width="40" height="16" fill="{b}"/><path d="M0 10 Q10 2 20 10 T40 10" fill="none" stroke="{c}" stroke-width="3"/>', 40
+        rot = ' patternTransform="rotate(45)"' if kind in ('stripes', 'checks') else (' patternTransform="rotate(-30)"' if kind == 'stripesR' else '')
+        h = 16 if kind == 'waves' else sz
+        out.append(f'<pattern id="p-{name}" width="{sz}" height="{h}" patternUnits="userSpaceOnUse"{rot}>{body}</pattern>')
+    return '<defs>' + ''.join(out) + '</defs>'
+
 class S:
     def __init__(s, w, h, bg=None):
         s.w, s.h, s.o = w, h, []
+        global SW
+        SW = max(w, h)/180
         if bg: s.rect(0, 0, w, h, bg)
+        if bg and THEME == 'britto': s.blocks(bg)
+    def blocks(s, bg):
+        # Britto backgrounds: the plane cut by a few straight lines into colored, patterned blocks
+        rnd = random.Random(s.w*7 + s.h)
+        pool = [c for c in (C['sky'], C['mustard'], C['salmon'], C['lav'], C['pink'], C['orange']) if c != bg]
+        xs = sorted(rnd.uniform(.12, .88)*s.w for _ in range(3))
+        prev = (0, 0)
+        for i, x in enumerate(xs + [s.w*1.0]):
+            tilt = rnd.uniform(-.25, .25)*s.w
+            x0, x1 = prev
+            s.poly([(x0, 0), (x + tilt, 0), (x - tilt, s.h), (x1, s.h)], bg if i % 2 == 0 else pool[i % len(pool)])
+            prev = (x + tilt, x - tilt)
     def add(s, x): s.o.append(x); return s
-    def rect(s, x, y, w, h, f, rx=0, **k): return s.add(f'<rect x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{h:.1f}" rx="{rx}" fill="{f}"{at(k)}/>')
-    def circ(s, x, y, r, f, **k): return s.add(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r:.1f}" fill="{f}"{at(k)}/>')
-    def ell(s, x, y, rx, ry, f, rot=0, **k): return s.add(f'<ellipse cx="{x:.1f}" cy="{y:.1f}" rx="{rx:.1f}" ry="{ry:.1f}" fill="{f}" transform="rotate({rot:.1f} {x:.1f} {y:.1f})"{at(k)}/>')
-    def poly(s, pts, f, **k): return s.add(f'<polygon points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in pts)}" fill="{f}"{at(k)}/>')
-    def path(s, d, f, **k): return s.add(f'<path d="{d}" fill="{f}"{at(k)}/>')
+    def rect(s, x, y, w, h, f, rx=0, **k): return s.add(f'<rect x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{h:.1f}" rx="{rx}" fill="{F(f)}"{sk(k, min(w, h))}{at(k)}/>')
+    def circ(s, x, y, r, f, **k): return s.add(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r:.1f}" fill="{F(f)}"{sk(k, 2*r)}{at(k)}/>')
+    def ell(s, x, y, rx, ry, f, rot=0, **k): return s.add(f'<ellipse cx="{x:.1f}" cy="{y:.1f}" rx="{rx:.1f}" ry="{ry:.1f}" fill="{F(f)}" transform="rotate({rot:.1f} {x:.1f} {y:.1f})"{sk(k, 2*min(rx, ry))}{at(k)}/>')
+    def poly(s, pts, f, **k): return s.add(f'<polygon points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in pts)}" fill="{F(f)}"{sk(k)}{at(k)}/>')
+    def path(s, d, f, **k): return s.add(f'<path d="{d}" fill="{F(f)}"{sk(k)}{at(k)}/>')
     def line(s, x1, y1, x2, y2, c, w=2, **k): return s.add(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{c}" stroke-width="{w}" stroke-linecap="round"{at(k)}/>')
     def svg(s, title):
         return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {s.w} {s.h}" preserveAspectRatio="xMidYMid slice" role="img">'
-                f'<title>{title}</title>' + ''.join(s.o) + '</svg>\n')
+                f'<title>{title}</title>' + (patterns() if THEME == 'britto' else '') + ''.join(s.o) + '</svg>\n')
+
+def sk(k, d=None):
+    # outline thickness follows the shape size, so leaves and eyes don't turn into black blobs
+    if THEME != 'britto' or 'stroke' in k: return ''
+    w = SW if d is None else min(SW, d*.18)
+    return f' stroke="#111" stroke-width="{w:.1f}" stroke-linejoin="round"' if w >= .9 else ''
 
 def at(k): return ''.join(f' {a.replace("_", "-")}="{v}"' for a, v in k.items())
 
@@ -327,7 +383,8 @@ def distribuidores():
     return s.svg('Ilustración: un taxista, una persona en silla de ruedas con una caja de Café del Canal y un señor con bastón en la calle')
 
 if __name__ == '__main__':
-    out = os.path.join(os.path.dirname(__file__), '..', 'img', 'ilustra')
+    THEME = sys.argv[1] if len(sys.argv) > 1 else 'flat'
+    out = os.path.join(os.path.dirname(__file__), '..', 'img', 'britto' if THEME == 'britto' else 'ilustra')
     os.makedirs(out, exist_ok=True)
     for name, fn in (('hero-canal', hero), ('proceso-vivero', vivero), ('proceso-cosecha', cosecha), ('proceso-tostado', proceso),
                      ('proceso-empaque', empaque), ('red-productores', productores), ('red-distribuidores', distribuidores)):
