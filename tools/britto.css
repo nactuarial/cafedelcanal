@@ -1,0 +1,32 @@
+/* pop-art theme in the manner of Romero Britto: vivid blocks, heavy black outlines, patterns */
+:root{--ink:#111;--paper:#fff;--card:#fff;--line:#111;--muted:#333;--teal:#7b2ff7;--mustard:#ffe600}
+h1,h2,h3,.brand strong,.fbrand strong,.hero .sub,.hero .lead{font-family:"Fredoka",system-ui,sans-serif!important;font-weight:700!important}
+.hero .sub{font-weight:500!important}
+body{font-family:"Nunito",system-ui,sans-serif}
+header{border-bottom:4px solid #111;background:#fff}
+.links a.on,.links a:hover{border-color:#ff1f3d}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none}
+.hero{border-bottom:4px solid #111}
+.hero h1{text-shadow:4px 4px 0 #111;color:#ffe600}
+.hero .sub{color:#fff;text-shadow:2px 2px 0 #111}
+.rule{background:repeating-linear-gradient(90deg,#ff1f3d 0 18px,#ffe600 18px 36px,#00c2ff 36px 54px);height:8px;border:2px solid #111}
+.btn{background:#ff1f3d;border:3px solid #111;border-radius:40px;box-shadow:4px 4px 0 #111;font-family:"Nunito",sans-serif;font-weight:800}
+.btn:hover{background:#ff7a00}
+.strip{background:#ffe600 radial-gradient(#fff 22%,transparent 24%) 0 0/18px 18px;border-bottom:4px solid #111}
+.strip::before{background:#111!important}
+.feat{border-color:#111!important;border-right-width:3px!important;font-weight:700}
+#servicios{gap:0;border-bottom:4px solid #111}
+.card{border-right:4px solid #111!important}
+.card:nth-child(1){background:#e8f9ff}.card:nth-child(2){background:#fff3d6}.card:nth-child(3){background:#ffe3f1}.card:nth-child(4){background:#efe3ff}
+.ph{border-bottom:4px solid #111}
+.badge{border:4px solid #111!important;box-shadow:3px 3px 0 #111}
+.g{background:#3cb043!important}.b{background:#ff1f3d!important}
+.card h3{color:#111}.card p{color:#333}
+.more{color:#111!important;border-bottom:3px solid #ff1f3d}
+.net{background:#7b2ff7 repeating-linear-gradient(45deg,transparent 0 14px,rgba(255,255,255,.12) 14px 22px)}
+.net::before{background:#111!important}
+.nc .eyebrow{color:#ffe600;font-weight:800}.nc h2{color:#fff;text-shadow:3px 3px 0 #111}.nc p{color:#fff}
+.net .ph2{border-top:4px solid #111}.net .ph2+.ph2{border-left:4px solid #111}
+footer{background:#111}footer::before{background:#111!important}
+.fbrand strong{color:#ffe600}
+@media(max-width:700px){.net .ph2+.ph2{border-left:0}.card{border-right:0!important;border-bottom:4px solid #111}}
